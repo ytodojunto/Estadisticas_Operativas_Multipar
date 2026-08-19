@@ -173,16 +173,23 @@
     <div class="kpi"><div class="kpi-label">Cancelados</div><div class="kpi-value" id="kRojo">–</div><div class="kpi-sub">se cobran igual</div></div>
   </div>
 
-  <h2>Reciprocidad con empresas colegas (acumulado anual)</h2>
+  <h2>Reciprocidad con empresas colegas (acumulado del período)</h2>
+  <div class="note">
+    <strong>Despachos vs. facturación:</strong> cuando una empresa colega nos cubrió un despacho completo (columna EMPRESA PCOS. con su nombre, marca verde), ese despacho SÍ cuenta como actividad/despacho de MULTIPAR, pero la facturación (CF) NO es nuestra — la cobra la empresa colega. Por eso el KPI "Despachos MULTIPAR" de arriba no los incluye en el CF, pero sí los vas a ver acá abajo y en el KPI "Despachos totales" separado.
+  </div>
   <div class="two-col">
     <div class="card">
-      <div class="muted" style="margin-bottom:8px">MULTIPAR cubrió despachos de estas empresas (oro)</div>
+      <div class="muted" style="margin-bottom:8px">MULTIPAR cubrió despachos de estas empresas (oro — sí factura MULTIPAR)</div>
       <div id="cubrimosChart"></div>
     </div>
     <div class="card">
-      <div class="muted" style="margin-bottom:8px">Despacho MULTIPAR cubierto por práctico de otra empresa (verde)</div>
-      <div id="cedidosChart"></div>
+      <div class="muted" style="margin-bottom:8px">Empresas colegas que nos cubrieron a nosotros (verde — no factura MULTIPAR)</div>
+      <div id="nosCubrieronChart"></div>
     </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <div class="muted" style="margin-bottom:8px">Despacho MULTIPAR (número propio) ejecutado por un práctico independiente — sí factura MULTIPAR</div>
+    <div id="cedidosChart"></div>
   </div>
 
   <h2>Cosas para confirmar con Chino</h2>
@@ -340,13 +347,14 @@ document.getElementById('detalleCerrar').addEventListener('click', ()=>{ documen
 function render(){
   const mes = document.getElementById('mesSel').value;
   const scope = scopeAgg();
-  document.getElementById('scopeInfo').textContent = mes==='TODO' ? '(mostrando el año completo 2025)' : `(mostrando ${mes.charAt(0)+mes.slice(1).toLowerCase()} 2025)`;
+  document.getElementById('scopeInfo').textContent = mes==='TODO' ? `(mostrando el año completo ${currentYear})` : `(mostrando ${mes.charAt(0)+mes.slice(1).toLowerCase()} ${currentYear})`;
 
   document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="kpi-label">Despachos MULTIPAR</div><div class="kpi-value">${scope.despachos.toLocaleString('es-AR')}</div><div class="kpi-sub">${mes==='TODO'?'2025 completo':mes}</div></div>
+    <div class="kpi"><div class="kpi-label">Despachos MULTIPAR</div><div class="kpi-value">${scope.despachos.toLocaleString('es-AR')}</div><div class="kpi-sub">${mes==='TODO'?currentYear+' completo':mes}</div></div>
     <div class="kpi"><div class="kpi-label">CF total facturado</div><div class="kpi-value">${scope.cf.toLocaleString('es-AR')}</div><div class="kpi-sub">coeficiente fiscal acumulado</div></div>
     <div class="kpi"><div class="kpi-label">CF promedio / despacho</div><div class="kpi-value">${(scope.cf/scope.despachos).toFixed(1)}</div><div class="kpi-sub">sobre despachos MULTIPAR</div></div>
     <div class="kpi"><div class="kpi-label">Despachos propios</div><div class="kpi-value">${scope.despachos_propios.toLocaleString('es-AR')}</div><div class="kpi-sub">agencia real, sin cubrimos a colegas</div></div>
+    <div class="kpi"><div class="kpi-label">Despachos totales</div><div class="kpi-value">${(scope.despachos_totales_incl_cubiertos ?? scope.despachos).toLocaleString('es-AR')}</div><div class="kpi-sub">incluye ${(scope.nos_cubrieron_despachos ?? 0).toLocaleString('es-AR')} cubiertos por colegas (no facturan)</div></div>
   `;
 
   document.getElementById('kManiobras').textContent = scope.maniobras;
@@ -364,7 +372,7 @@ function render(){
 
 const YEARS = [
   {year:2025, file:'data.json', available:true},
-  {year:2026, file:'data_2026.json', available:false},
+  {year:2026, file:'data_2026.json', available:true},
 ];
 let currentYear = 2025;
 
@@ -396,19 +404,22 @@ async function loadYear(y){
 
   const cubrimos = Object.entries(DATA.cubrimos_por_empresa).map(([k,v])=>({empresa:k,despachos:v})).sort((a,b)=>b.despachos-a.despachos);
   const cedidos = Object.entries(DATA.cedidos_por_practico).map(([k,v])=>({practico:k,despachos:v})).sort((a,b)=>b.despachos-a.despachos);
+  const nosCubrieron = Object.entries(DATA.nos_cubrieron_por_empresa||{}).map(([k,v])=>({empresa:k,despachos:v})).sort((a,b)=>b.despachos-a.despachos);
   barList(document.getElementById('cubrimosChart'), cubrimos, 'empresa', 'despachos', 'var(--series-6)');
   barList(document.getElementById('cedidosChart'), cedidos, 'practico', 'despachos', 'var(--series-3)');
+  barList(document.getElementById('nosCubrieronChart'), nosCubrieron, 'empresa', 'despachos', 'var(--series-5)');
 
-  const otrosLines = Object.entries(DATA.otros_por_empresa||{}).map(([k,v])=>`<li>${k}: ${v} filas</li>`).join('');
-  document.getElementById('notasPendientes').innerHTML = `
-    <ul>
-      <li><strong>131 filas de la planilla</strong> traen el nombre de una empresa colega directamente en la columna "EMPRESA PCOS." en vez de "MULTIPAR" (sobre todo COPRAC, 111 filas). Se excluyeron de los totales de despachos/CF propios de MULTIPAR; quedan documentadas acá pero falta confirmar si deben sumarse a "cubrimos"/"cedidos": ${otrosLines}</li>
-      <li><strong>FALCON</strong> (resuelto): de abril a agosto sus despachos aparecen 100% marcados en verde. Según explicó Chino, estuvo alternando entre el turno normal y salidas por enfermedad, y cuando se sentía bien salía a cubrir algún barco — al no estar formalmente en el turno esos meses, la planilla lo marca igual que a un práctico externo. Desde septiembre vuelve a la rotación normal. Ver el detalle mes a mes haciendo clic en su fila del ranking.</li>
-      <li><strong>"CUBA"</strong> aparece como práctico separado de "CUBA S." y "CUBA E." en 4 despachos — probablemente falta el inicial en la carga y hay que asignarlos a uno de los dos.</li>
-      <li>Empresas colegas <strong>PDP, P. DELTA, PILOTAR</strong> y el práctico <strong>PAEZ FEDERICO</strong>: aparecen con actividad real en 2025 (no son solo plantilla vieja) — confirmar que siguen vigentes en 2026.</li>
-      <li><strong>Horas de demora</strong> (marca azul): todavía no identificamos dónde vive el valor numérico en la planilla.</li>
-      <li><strong>Prestación Accesoria (PA):</strong> no aparece en ninguna de las planillas de despachos revisadas — falta la fuente de ese dato para el análisis de despachos/facturación vs. reparto de PA.</li>
-    </ul>`;
+  const notas = [];
+  if (y.year===2025){
+    notas.push(`<li><strong>FALCON</strong> (resuelto): de abril a agosto 2025 sus despachos aparecen 100% marcados en verde. Según explicó Chino, estuvo alternando entre el turno normal y salidas por enfermedad, y cuando se sentía bien salía a cubrir algún barco — al no estar formalmente en el turno esos meses, la planilla lo marca igual que a un práctico externo. Desde septiembre 2025 vuelve a la rotación normal (y se confirma en 2026: cero despachos en verde). Ver el detalle mes a mes haciendo clic en su fila del ranking.</li>`);
+    notas.push(`<li><strong>"CUBA"</strong> aparece como práctico separado de "CUBA S." y "CUBA E." (dos hermanos) en 4 despachos de 2025 — probablemente falta la inicial en la carga. Falta que Chino confirme a cuál de los dos asignarlos. (No se repite en 2026.)</li>`);
+  }
+  notas.push(`<li>Empresas colegas <strong>PDP</strong> (Pilotos del Paraná), <strong>P. DELTA</strong> y <strong>PILOTAR</strong>, y el práctico independiente <strong>PAEZ FEDERICO</strong>: confirmado con datos de 2025 y 2026 que siguen activos.</li>`);
+  notas.push(`<li><strong>Horas de demora</strong> (marca azul): Chino indicó que se calculan desde el momento de embarque hasta la hora de inicio del práctico — pero todavía no identificamos las dos columnas de horario que corresponden a esos momentos en la planilla. Falta que Chino indique en qué columnas están esos horarios para poder cuantificarlas.</li>`);
+  if (y.year===2026){
+    notas.push(`<li><strong>ISA</strong> aparece dentro de "a quién le cubrimos" (oro) en 2026 con 2 filas — ISA es una agencia, no una empresa colega, así que una fila marcada oro con AGENCIA=ISA es un caso raro a revisar en la planilla original.</li>`);
+  }
+  document.getElementById('notasPendientes').innerHTML = `<ul>${notas.join('')}</ul>`;
 
   document.getElementById('footer').textContent = `Generado a partir de las planillas mensuales de despachos de MULTIPAR S.A. (${y.year}). Los colores de la planilla original (violeta=maniobra, azul=demora, amarillo=franco cubierto, verde=cedido a colega, oro=cubrimos a colega, rojo=cancelado) se usaron para reconstruir estas estadísticas.`;
 

@@ -1,12 +1,12 @@
-# Estadísticas MULTIPAR 2025 — sitio interactivo
+# Estadísticas MULTIPAR — sitio interactivo (2025-2026)
 
-Este es un sitio estático (HTML + JS, sin backend) con las estadísticas de despachos de MULTIPAR de 2025: despachos, CF, maniobras, francos cubiertos, reciprocidad con empresas colegas, por práctico/agencia/canal, con filtro por mes.
+Este es un sitio estático (HTML + JS, sin backend) con las estadísticas de despachos de MULTIPAR: despachos, CF, maniobras, francos cubiertos, reciprocidad con empresas colegas, por práctico/agencia/canal, con selector de año (2025 completo, 2026 hasta agosto) y filtro por mes.
 
 ## Cómo publicarlo en GitHub Pages (sin escribir código)
 
 1. Entrá a github.com, iniciá sesión (o creá una cuenta gratuita) y hacé clic en **New repository**. Ponele un nombre, por ejemplo `multipar-estadisticas`, y creálo (puede ser público o privado — si es privado, GitHub Pages solo funciona en planes pagos; si lo compartís con los socios colegas conviene público, o "unlisted" agregándolos como colaboradores).
 2. Dentro del repo recién creado, hacé clic en **Add file → Upload files**.
-3. Arrastrá los 3 archivos de esta carpeta: `index.html`, `data.json` y este `README.md`. Hacé clic en **Commit changes**.
+3. Arrastrá los 4 archivos de esta carpeta: `index.html`, `data.json`, `data_2026.json` y este `README.md`. Hacé clic en **Commit changes**.
 4. Andá a **Settings → Pages** (menú de la izquierda).
 5. En "Build and deployment", elegí **Deploy from a branch**, rama `main`, carpeta `/ (root)`. Guardá.
 6. Esperá un minuto y GitHub te va a mostrar la URL pública, algo como `https://<tu-usuario>.github.io/multipar-estadisticas/`. Esa es la que le pasás a los socios colegas.
@@ -23,9 +23,9 @@ Para uso interno entre socios de confianza, con el link sin publicitar y el logi
 
 ## Actualizar mes a mes / agregar un año nuevo
 
-Cuando tengas un mes nuevo cargado, avisame y te genero un `data.json` actualizado — solo hay que subir ese archivo de nuevo al repo (Upload files, reemplaza el que ya existe) y el sitio se actualiza solo, no hay que tocar `index.html`.
+Cuando tengas un mes nuevo cargado (por ejemplo septiembre 2026), avisame y te regenero el `data_2026.json` — solo hay que subir ese archivo de nuevo al repo (Upload files, reemplaza el que ya existe) y el sitio se actualiza solo, no hay que tocar `index.html`.
 
-El sitio ya tiene un selector de año arriba a la izquierda (chips "2025" / "2026"). Cuando tengamos 2026 completo, genero un `data_2026.json` y con un cambio de una línea en `index.html` (la lista `YEARS`) queda disponible el chip — avisame cuando quieras sumarlo.
+El sitio tiene un selector de año arriba a la izquierda (chips "2025" / "2026", ambos activos). Cuando arranque 2027, avisame y agrego el chip nuevo.
 
 ## Qué muestra
 
