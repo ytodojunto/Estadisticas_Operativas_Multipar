@@ -21,6 +21,11 @@
     --series-5: #e87ba4;
     --series-6: #4a3aa7;
     --warn: #fab219;
+    --brand-1: #063455;
+    --brand-2: #0f8b8d;
+    --brand-3: #14b8a6;
+    --brand-gold: #f2b134;
+    --brand-grad: linear-gradient(135deg, var(--brand-1) 0%, var(--brand-2) 65%, var(--brand-3) 100%);
   }
   @media (prefers-color-scheme: dark) {
     :root:where(:not([data-theme="light"])) .viz-root {
@@ -39,21 +44,38 @@
       --series-5: #d55181;
       --series-6: #9085e9;
       --warn: #fab219;
+      --brand-1: #041f33;
+      --brand-2: #0f8b8d;
+      --brand-3: #17d4bd;
+      --brand-gold: #f2b134;
     }
   }
   * { box-sizing: border-box; }
   body { margin:0; background: var(--page); font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--text-primary); }
-  .wrap { max-width: 1140px; margin: 0 auto; padding: 28px 20px 64px; }
+  .wrap { max-width: 1140px; margin: 0 auto; padding: 0 20px 64px; }
   h1 { font-size: 22px; margin: 0 0 4px; }
   .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; }
-  h2 { font-size: 16px; margin: 40px 0 12px; padding-bottom: 8px; border-bottom: 1px solid var(--grid); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
-  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  h2 { position:relative; font-size: 16px; margin: 40px 0 12px; padding-bottom: 8px; padding-left: 14px; border-bottom: 1px solid var(--grid); display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;}
+  h2::before { content:""; position:absolute; left:0; top:1px; bottom:9px; width:4px; border-radius:2px; background: var(--brand-grad); }
+  .card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: transform .15s ease, box-shadow .15s ease; }
+  .card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6,52,85,0.10); }
   .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 12px; }
-  .kpi { background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .kpi { position:relative; background: var(--surface-1); border: 1px solid var(--border); border-radius: 12px; padding: 16px; overflow:hidden; transition: transform .15s ease, box-shadow .15s ease; }
+  .kpi::before { content:""; position:absolute; top:0; left:0; right:0; height:3px; background: var(--brand-grad); }
+  .kpi:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(6,52,85,0.12); }
   .kpi-label { font-size: 12px; color: var(--text-secondary); margin-bottom: 6px; }
-  .kpi-value { font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .kpi-value { font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums; background: var(--brand-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .kpi-sub { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
   .toolbar { position: sticky; top:0; z-index: 5; background: var(--page); padding: 14px 0 10px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; border-bottom: 1px solid var(--grid); margin-bottom: 18px;}
+  .hero { background: var(--brand-grad); border-radius: 0 0 22px 22px; padding: 26px 20px 32px; margin: 0 0 24px; color:#fff; position:relative; overflow:hidden; }
+  .hero::after { content:""; position:absolute; inset:0; background: radial-gradient(circle at 85% -10%, rgba(242,177,52,0.35), transparent 55%), radial-gradient(circle at 5% 120%, rgba(20,184,166,0.4), transparent 50%); pointer-events:none; }
+  .hero-inner { max-width: 1140px; margin:0 auto; position:relative; z-index:1; display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .hero-text { flex:1; min-width:220px; }
+  .hero h1 { color:#fff; font-size:24px; letter-spacing:.01em; }
+  .hero .subtitle { color: rgba(255,255,255,0.82); margin-bottom:0; }
+  .logo-badge { flex-shrink:0; width:56px; aspect-ratio:1/1; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.25)); }
+  @keyframes badgeIn { from { transform: scale(.8) rotate(-8deg); opacity:0; } to { transform: scale(1) rotate(0); opacity:1; } }
+  .logo-badge svg { animation: badgeIn .5s ease-out; }
   select { font: inherit; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-1); color: var(--text-primary); }
   .bar-row { display: grid; grid-template-columns: 130px 1fr 60px; align-items: center; gap: 10px; padding: 3px 0; cursor:default; }
   .bar-label { font-size: 12px; color: var(--text-secondary); text-align: right; white-space: nowrap; overflow:hidden; text-overflow: ellipsis; }
@@ -66,9 +88,10 @@
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th { text-align: right; color: var(--text-secondary); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .02em; padding: 8px 10px; border-bottom: 1px solid var(--grid); cursor: pointer; user-select:none; white-space:nowrap;}
   th:first-child, th:nth-child(2) { text-align:left; }
-  th.sorted { color: var(--series-1); }
+  th.sorted { color: var(--brand-2); }
   td { padding: 7px 10px; border-bottom: 1px solid var(--grid); text-align:right; font-variant-numeric: tabular-nums; }
   td:first-child, td:nth-child(2) { text-align:left; font-variant-numeric: normal; }
+  tr { transition: background .1s; }
   tr:hover td { background: var(--grid); }
   .muted { color: var(--text-muted); font-size: 12px; }
   .note { background: var(--surface-1); border: 1px solid var(--border); border-left: 3px solid var(--warn); border-radius: 8px; padding: 14px 16px; font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
@@ -82,16 +105,19 @@
   svg text { fill: var(--text-muted); font-size: 10px; font-family: system-ui, sans-serif; }
   .chart-wrap { position: relative; }
   .scope-tag { font-size:11px; color: var(--text-muted); font-weight:400; }
-  #loginGate { position:fixed; inset:0; background:var(--page); z-index:100; display:flex; align-items:center; justify-content:center; }
-  #loginBox { background:var(--surface-1); border:1px solid var(--grid); box-shadow:0 4px 24px rgba(0,0,0,0.08); border-radius:14px; padding:32px; width:280px; text-align:center; }
+  #loginGate { position:fixed; inset:0; background: var(--brand-grad); z-index:100; display:flex; align-items:center; justify-content:center; }
+  #loginGate::after { content:""; position:absolute; inset:0; background: radial-gradient(circle at 80% 15%, rgba(242,177,52,0.35), transparent 55%), radial-gradient(circle at 10% 90%, rgba(20,184,166,0.45), transparent 50%); pointer-events:none; }
+  #loginBox { position:relative; z-index:1; background:var(--surface-1); border:1px solid var(--grid); box-shadow:0 12px 40px rgba(0,0,0,0.28); border-radius:16px; padding:32px; width:280px; text-align:center; }
+  #loginBox .logo-badge { margin:0 auto 10px; width:56px; }
   #loginBox input { display:block; width:100%; font:inherit; font-size:14px; padding:10px 12px; border-radius:8px; border:1.5px solid var(--grid); background:var(--page); color:var(--text-primary); margin-top:12px; }
-  #loginBox input:focus { outline:none; border-color:var(--series-1); }
-  #loginBox button { display:block; width:100%; font:inherit; font-size:14px; padding:10px; border-radius:8px; border:none; background:var(--series-1); color:#fff; margin-top:16px; cursor:pointer; font-weight:600; }
-  #loginBox button:hover { opacity:0.9; }
+  #loginBox input:focus { outline:none; border-color:var(--brand-2); }
+  #loginBox button { display:block; width:100%; font:inherit; font-size:14px; padding:11px; border-radius:8px; border:none; background: var(--brand-grad); color:#fff; margin-top:16px; cursor:pointer; font-weight:700; letter-spacing:.02em; transition: transform .12s ease, box-shadow .12s ease; }
+  #loginBox button:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15,139,141,0.35); }
   #loginError { color:var(--series-2); font-size:12px; margin-top:10px; min-height:14px; }
   .year-chips { display:flex; gap:8px; margin-bottom: 4px; }
-  .year-chip { padding:6px 14px; border-radius:20px; border:1px solid var(--border); background:var(--surface-1); color:var(--text-secondary); font-size:13px; cursor:pointer; }
-  .year-chip.active { background:var(--series-1); color:#fff; border-color:var(--series-1); }
+  .year-chip { padding:6px 16px; border-radius:20px; border:1px solid rgba(255,255,255,0.35); background:rgba(255,255,255,0.12); color:#fff; font-size:13px; font-weight:600; cursor:pointer; transition: transform .12s ease, background .12s ease; }
+  .year-chip:hover { background: rgba(255,255,255,0.22); transform: translateY(-1px); }
+  .year-chip.active { background: var(--brand-gold); color:#1a1200; border-color: var(--brand-gold); }
   .year-chip.disabled { opacity:.4; cursor:default; }
 </style>
 </head>
@@ -99,7 +125,18 @@
 
 <div id="loginGate" class="viz-root">
   <div id="loginBox">
-    <div style="font-weight:600; font-size:16px; margin-bottom:2px;">MULTIPAR</div>
+    <div class="logo-badge"><svg width="100%" height="100%" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#0f8b8d"/><stop offset="100%" stop-color="#f2b134"/>
+      </linearGradient></defs>
+      <circle cx="28" cy="28" r="26" fill="url(#logoGrad)" stroke="#fff" stroke-width="2"/>
+      <g stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round">
+        <circle cx="28" cy="28" r="14"/>
+        <circle cx="28" cy="28" r="3" fill="#fff"/>
+        <path d="M28 6v8M28 42v8M6 28h8M42 28h8M13 13l6 6M37 37l6 6M43 13l-6 6M19 37l-6 6"/>
+      </g>
+    </svg></div>
+    <div style="font-weight:700; font-size:17px; margin-bottom:2px; letter-spacing:.02em;">MULTIPAR</div>
     <div class="muted">Estadísticas de despachos — acceso restringido</div>
     <input id="loginUser" type="text" placeholder="Usuario" autocomplete="username">
     <input id="loginPass" type="password" placeholder="Contraseña" autocomplete="current-password">
@@ -109,12 +146,29 @@
 </div>
 
 <div class="viz-root" id="mainContent" style="display:none;">
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="logo-badge" style="width:64px"><svg width="100%" height="100%" viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="logoGrad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0%" stop-color="#0f8b8d"/><stop offset="100%" stop-color="#f2b134"/>
+      </linearGradient></defs>
+      <circle cx="28" cy="28" r="26" fill="url(#logoGrad)" stroke="#fff" stroke-width="2"/>
+      <g stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round">
+        <circle cx="28" cy="28" r="14"/>
+        <circle cx="28" cy="28" r="3" fill="#fff"/>
+        <path d="M28 6v8M28 42v8M6 28h8M42 28h8M13 13l6 6M37 37l6 6M43 13l-6 6M19 37l-6 6"/>
+      </g>
+    </svg></div>
+    <div class="hero-text">
+      <h1>MULTIPAR — Estadísticas de Despachos</h1>
+      <div class="subtitle" id="subtitle">Año 2025 · fuente: planillas mensuales de despachos (Enero–Diciembre 2025)</div>
+      <div class="year-chips" id="yearChips"></div>
+    </div>
+  </div>
+</div>
+
 <div class="wrap">
-
-  <h1>MULTIPAR — Estadísticas de Despachos</h1>
-  <div class="subtitle" id="subtitle">Año 2025 · fuente: planillas mensuales de despachos (Enero–Diciembre 2025)</div>
-
-  <div class="year-chips" id="yearChips"></div>
 
   <div class="toolbar">
     <label for="mesSel" class="muted">Ver:</label>
@@ -137,7 +191,7 @@
       <thead><tr>
         <th data-k="i">#</th><th data-k="practico">Práctico</th>
         <th data-k="despachos">Despachos</th><th data-k="cf">CF total</th><th data-k="cf_prom">CF prom.</th>
-        <th data-k="maniobras">Maniobras</th><th data-k="amarillo">Francos cub.</th><th data-k="oro">Cubrió colegas</th>
+        <th data-k="maniobras">Maniobras</th><th data-k="amarillo">Francos cub.</th><th data-k="oro" title="Despachos de una empresa colega (marca oro) que cubrió personalmente este práctico">Cubrió a colega ⓘ</th>
       </tr></thead>
       <tbody></tbody>
     </table>
@@ -161,6 +215,7 @@
     <div class="card"><div class="muted" style="margin-bottom:8px">Despachos</div><div id="agenciaDesp"></div></div>
     <div class="card"><div class="muted" style="margin-bottom:8px">CF total</div><div id="agenciaCF"></div></div>
   </div>
+  <div class="card" style="margin-top:12px"><div class="muted" style="margin-bottom:8px">CF promedio por despacho</div><div id="agenciaCFProm"></div></div>
 
   <h2>Despachos por canal de navegación</h2>
   <div class="card" style="max-width:480px"><div id="canalChart"></div></div>
@@ -168,22 +223,22 @@
   <h2>Reciprocidad, francos y demoras <span class="scope-tag">acumulado del período seleccionado</span></h2>
   <div class="four-col">
     <div class="kpi"><div class="kpi-label">Maniobras</div><div class="kpi-value" id="kManiobras">–</div><div class="kpi-sub">práctico que llega a destino</div></div>
-    <div class="kpi"><div class="kpi-label">Demoras marcadas</div><div class="kpi-value" id="kAzul">–</div><div class="kpi-sub">sin horas cuantificadas aún</div></div>
+    <div class="kpi"><div class="kpi-label">Buques con demora</div><div class="kpi-value" id="kAzul">–</div><div class="kpi-sub">marca azul en la planilla (sin datos de horas)</div></div>
     <div class="kpi"><div class="kpi-label">Cubiertos en franco</div><div class="kpi-value" id="kAmarillo">–</div><div class="kpi-sub">colega de franco que cubrió</div></div>
     <div class="kpi"><div class="kpi-label">Cancelados</div><div class="kpi-value" id="kRojo">–</div><div class="kpi-sub">se cobran igual</div></div>
   </div>
 
-  <h2>Reciprocidad con empresas colegas (acumulado del período)</h2>
+  <h2>Reciprocidad con empresas colegas <span class="scope-tag">acumulado anual — no cambia con el filtro de mes</span></h2>
   <div class="note">
-    <strong>Despachos vs. facturación:</strong> cuando una empresa colega nos cubrió un despacho completo (columna EMPRESA PCOS. con su nombre, marca verde), ese despacho SÍ cuenta como actividad/despacho de MULTIPAR, pero la facturación (CF) NO es nuestra — la cobra la empresa colega. Por eso el KPI "Despachos MULTIPAR" de arriba no los incluye en el CF, pero sí los vas a ver acá abajo y en el KPI "Despachos totales" separado.
+    <strong>Despachos vs. facturación:</strong> cuando una empresa colega nos cubrió un despacho completo (columna EMPRESA PCOS. con su nombre), ese despacho SÍ cuenta como actividad/despacho de MULTIPAR (KPI "Despachos totales" de arriba), pero la facturación (CF) NO es nuestra — la cobra la empresa colega, por eso no está incluida en el KPI "Despachos MULTIPAR" ni en el CF.
   </div>
   <div class="two-col">
     <div class="card">
-      <div class="muted" style="margin-bottom:8px">MULTIPAR cubrió despachos de estas empresas (oro — sí factura MULTIPAR)</div>
+      <div class="muted" style="margin-bottom:8px" title="Despachos que le correspondían a una empresa colega pero los cubrió MULTIPAR — sí factura MULTIPAR">MULTIPAR cubrió despachos de estas empresas ⓘ</div>
       <div id="cubrimosChart"></div>
     </div>
     <div class="card">
-      <div class="muted" style="margin-bottom:8px">Empresas colegas que nos cubrieron a nosotros (verde — no factura MULTIPAR)</div>
+      <div class="muted" style="margin-bottom:8px" title="Despachos propios de MULTIPAR que terminó cubriendo una empresa colega — no factura MULTIPAR">Empresas colegas que nos cubrieron a nosotros ⓘ</div>
       <div id="nosCubrieronChart"></div>
     </div>
   </div>
@@ -243,6 +298,7 @@ function lineChart(svg, points, color, fmtVal){
   html += `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>`;
   points.forEach((p,i)=>{
     html += `<circle data-i="${i}" cx="${x(i).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="4" fill="${color}" stroke="var(--surface-1)" stroke-width="1.5" style="cursor:pointer"/>`;
+    html += `<text x="${x(i).toFixed(1)}" y="${Math.max(padT+9, y(p.v)-9).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--text-secondary)">${p.v.toLocaleString('es-AR')}</text>`;
     html += `<text x="${x(i).toFixed(1)}" y="${H-6}" text-anchor="middle">${MESES_LABEL[p.mes]}</text>`;
   });
   svg.innerHTML = html;
@@ -344,18 +400,38 @@ function renderDetalle(practico){
 }
 document.getElementById('detalleCerrar').addEventListener('click', ()=>{ document.getElementById('detallePracticoCard').style.display='none'; });
 
+function animateKpis(){
+  document.querySelectorAll('#kpis .kpi-value').forEach(el=>{
+    const target = parseFloat(el.dataset.target);
+    if (!isFinite(target)) { el.textContent = '–'; return; }
+    const dec = +(el.dataset.dec||0);
+    const dur = 600;
+    const t0 = performance.now();
+    function tick(now){
+      const t = Math.min(1, (now-t0)/dur);
+      const eased = 1 - Math.pow(1-t, 3);
+      const val = target*eased;
+      el.textContent = dec ? val.toFixed(dec) : Math.round(val).toLocaleString('es-AR');
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = dec ? target.toFixed(dec) : target.toLocaleString('es-AR');
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
 function render(){
   const mes = document.getElementById('mesSel').value;
   const scope = scopeAgg();
   document.getElementById('scopeInfo').textContent = mes==='TODO' ? `(mostrando el año completo ${currentYear})` : `(mostrando ${mes.charAt(0)+mes.slice(1).toLowerCase()} ${currentYear})`;
 
   document.getElementById('kpis').innerHTML = `
-    <div class="kpi"><div class="kpi-label">Despachos MULTIPAR</div><div class="kpi-value">${scope.despachos.toLocaleString('es-AR')}</div><div class="kpi-sub">${mes==='TODO'?currentYear+' completo':mes}</div></div>
-    <div class="kpi"><div class="kpi-label">CF total facturado</div><div class="kpi-value">${scope.cf.toLocaleString('es-AR')}</div><div class="kpi-sub">coeficiente fiscal acumulado</div></div>
-    <div class="kpi"><div class="kpi-label">CF promedio / despacho</div><div class="kpi-value">${(scope.cf/scope.despachos).toFixed(1)}</div><div class="kpi-sub">sobre despachos MULTIPAR</div></div>
-    <div class="kpi"><div class="kpi-label">Despachos propios</div><div class="kpi-value">${scope.despachos_propios.toLocaleString('es-AR')}</div><div class="kpi-sub">agencia real, sin cubrimos a colegas</div></div>
-    <div class="kpi"><div class="kpi-label">Despachos totales</div><div class="kpi-value">${(scope.despachos_totales_incl_cubiertos ?? scope.despachos).toLocaleString('es-AR')}</div><div class="kpi-sub">incluye ${(scope.nos_cubrieron_despachos ?? 0).toLocaleString('es-AR')} cubiertos por colegas (no facturan)</div></div>
+    <div class="kpi" title="Despachos con número propio de MULTIPAR, EMPRESA PCOS. = MULTIPAR. Es la base de la facturación (CF)."><div class="kpi-label">Despachos MULTIPAR ⓘ</div><div class="kpi-value" data-target="${scope.despachos}">0</div><div class="kpi-sub">${mes==='TODO'?currentYear+' completo':mes}</div></div>
+    <div class="kpi" title="Coeficiente Fiscal acumulado de los despachos MULTIPAR (facturación)."><div class="kpi-label">CF total facturado ⓘ</div><div class="kpi-value" data-target="${scope.cf}">0</div><div class="kpi-sub">coeficiente fiscal acumulado</div></div>
+    <div class="kpi" title="CF total dividido despachos MULTIPAR."><div class="kpi-label">CF promedio / despacho ⓘ</div><div class="kpi-value" data-target="${(scope.cf/scope.despachos).toFixed(1)}" data-dec="1">0.0</div><div class="kpi-sub">sobre despachos MULTIPAR</div></div>
+    <div class="kpi" title="Despachos MULTIPAR de agencia real, sin contar los que MULTIPAR cubrió a una empresa colega (oro)."><div class="kpi-label">Despachos propios ⓘ</div><div class="kpi-value" data-target="${scope.despachos_propios}">0</div><div class="kpi-sub">agencia real, sin cubrir a colegas</div></div>
+    <div class="kpi" title="Despachos MULTIPAR + despachos propios que terminó cubriendo una empresa colega (cuentan como actividad, no como facturación de MULTIPAR)."><div class="kpi-label">Despachos totales ⓘ</div><div class="kpi-value" data-target="${scope.despachos_totales_incl_cubiertos ?? scope.despachos}">0</div><div class="kpi-sub">incluye ${(scope.nos_cubrieron_despachos ?? 0).toLocaleString('es-AR')} cubiertos por colegas (no facturan)</div></div>
   `;
+  animateKpis();
 
   document.getElementById('kManiobras').textContent = scope.maniobras;
   document.getElementById('kAzul').textContent = scope.azul;
@@ -367,6 +443,8 @@ function render(){
   const {ag, canal} = agenciaCanalForScope();
   barList(document.getElementById('agenciaDesp'), ag, 'agencia', 'despachos', 'var(--series-1)');
   barList(document.getElementById('agenciaCF'), ag, 'agencia', 'cf', 'var(--series-2)');
+  const agCfProm = ag.map(a=>({agencia:a.agencia, cf_prom: a.despachos ? Math.round((a.cf/a.despachos)*10)/10 : 0})).sort((a,b)=>b.cf_prom-a.cf_prom);
+  barList(document.getElementById('agenciaCFProm'), agCfProm, 'agencia', 'cf_prom', 'var(--series-5)', v=>v.toFixed(1));
   barList(document.getElementById('canalChart'), canal, 'canal', 'despachos', 'var(--series-4)');
 }
 
@@ -414,12 +492,7 @@ async function loadYear(y){
     notas.push(`<li><strong>FALCON</strong> (resuelto): de abril a agosto 2025 sus despachos aparecen 100% marcados en verde. Según explicó Chino, estuvo alternando entre el turno normal y salidas por enfermedad, y cuando se sentía bien salía a cubrir algún barco — al no estar formalmente en el turno esos meses, la planilla lo marca igual que a un práctico externo. Desde septiembre 2025 vuelve a la rotación normal (y se confirma en 2026: cero despachos en verde). Ver el detalle mes a mes haciendo clic en su fila del ranking.</li>`);
     notas.push(`<li><strong>"CUBA"</strong> aparece como práctico separado de "CUBA S." y "CUBA E." (dos hermanos) en 4 despachos de 2025 — probablemente falta la inicial en la carga. Falta que Chino confirme a cuál de los dos asignarlos. (No se repite en 2026.)</li>`);
   }
-  notas.push(`<li>Empresas colegas <strong>PDP</strong> (Pilotos del Paraná), <strong>P. DELTA</strong> y <strong>PILOTAR</strong>, y el práctico independiente <strong>PAEZ FEDERICO</strong>: confirmado con datos de 2025 y 2026 que siguen activos.</li>`);
-  notas.push(`<li><strong>Horas de demora</strong> (marca azul): Chino indicó que se calculan desde el momento de embarque hasta la hora de inicio del práctico — pero todavía no identificamos las dos columnas de horario que corresponden a esos momentos en la planilla. Falta que Chino indique en qué columnas están esos horarios para poder cuantificarlas.</li>`);
-  if (y.year===2026){
-    notas.push(`<li><strong>ISA</strong> aparece dentro de "a quién le cubrimos" (oro) en 2026 con 2 filas — ISA es una agencia, no una empresa colega, así que una fila marcada oro con AGENCIA=ISA es un caso raro a revisar en la planilla original.</li>`);
-  }
-  document.getElementById('notasPendientes').innerHTML = `<ul>${notas.join('')}</ul>`;
+  document.getElementById('notasPendientes').innerHTML = notas.length ? `<ul>${notas.join('')}</ul>` : `<span class="muted">Sin observaciones pendientes para ${y.year}.</span>`;
 
   document.getElementById('footer').textContent = `Generado a partir de las planillas mensuales de despachos de MULTIPAR S.A. (${y.year}). Los colores de la planilla original (violeta=maniobra, azul=demora, amarillo=franco cubierto, verde=cedido a colega, oro=cubrimos a colega, rojo=cancelado) se usaron para reconstruir estas estadísticas.`;
 
